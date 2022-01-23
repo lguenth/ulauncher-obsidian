@@ -1,24 +1,25 @@
-import gi
-from ulauncher.api.shared.action.ExtensionCustomAction import ExtensionCustomAction
-
-gi.require_version("Gdk", "3.0")
-from src.items import quick_capute_note, show_notes, create_note
+import logging
+from ulauncher.api.shared.action.HideWindowAction import HideWindowAction
+from ulauncher.api.shared.action.DoNothingAction import DoNothingAction
+from ulauncher.api.shared.action.OpenAction import OpenAction
+from ulauncher.api.shared.action.RenderResultListAction import RenderResultListAction
+from ulauncher.api.shared.event import KeywordQueryEvent, ItemEnterEvent
+from ulauncher.api.client.EventListener import EventListener
+from ulauncher.api.client.Extension import Extension
 from src.functions import (
     append_to_note_in_vault,
     find_note_in_vault,
     find_string_in_vault,
+    find_tag_in_vault,
     create_note_in_vault,
     generate_daily_url,
     generate_url,
 )
-from ulauncher.api.client.Extension import Extension
-from ulauncher.api.client.EventListener import EventListener
-from ulauncher.api.shared.event import KeywordQueryEvent, ItemEnterEvent
-from ulauncher.api.shared.action.RenderResultListAction import RenderResultListAction
-from ulauncher.api.shared.action.OpenAction import OpenAction
-from ulauncher.api.shared.action.DoNothingAction import DoNothingAction
-from ulauncher.api.shared.action.HideWindowAction import HideWindowAction
-import logging
+from src.items import quick_capture_note, show_notes, create_note
+import gi
+from ulauncher.api.shared.action.ExtensionCustomAction import ExtensionCustomAction
+
+gi.require_version("Gdk", "3.0")
 
 logger = logging.getLogger(__name__)
 
@@ -42,8 +43,9 @@ class ItemEnterEventListener(EventListener):
             return OpenAction(url)
 
         elif type == "quick-capture":
-            quick_capute_note = extension.preferences["obsidian_quick_capture_note"]
-            append_to_note_in_vault(vault, quick_capute_note, data.get("content"))
+            quick_capture_note = extension.preferences["obsidian_quick_capture_note"]
+            append_to_note_in_vault(
+                vault, quick_capture_note, data.get("content"))
             return HideWindowAction()
 
         return DoNothingAction()
@@ -57,6 +59,7 @@ class KeywordQueryEventListener(EventListener):
         keyword_search_string_vault = extension.preferences[
             "obsidian_search_string_vault"
         ]
+        keyword_search_tag_vault = extension.preferences["obsidian_search_tag_vault"]
         keyword_open_daily = extension.preferences["obsidian_open_daily"]
         keyword_quick_capture = extension.preferences["obsidian_quick_capture"]
 
@@ -75,11 +78,17 @@ class KeywordQueryEventListener(EventListener):
             items += create_note(search)
             return RenderResultListAction(items)
 
+        elif keyword == keyword_search_tag_vault:
+            notes = find_tag_in_vault(vault, search)
+            items = show_notes(vault, notes)
+            # TODO Create note with tag?
+            return RenderResultListAction(items)
+
         elif keyword == keyword_open_daily:
             return OpenAction(generate_daily_url(vault))
 
         elif keyword == keyword_quick_capture:
-            items = quick_capute_note(search)
+            items = quick_capture_note(search)
             return RenderResultListAction(items)
 
         return DoNothingAction()

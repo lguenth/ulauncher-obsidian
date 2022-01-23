@@ -16,6 +16,13 @@
       "default_value": ""
     },
     {
+      "id": "tags_json",
+      "type": "input",
+      "name": "Tags",
+      "description": "Path to your tags.json (absolute)",
+      "default_value": ""
+    },
+    {
       "id": "obsidian_search_note_vault",
       "type": "keyword",
       "name": "Search Note",
@@ -28,6 +35,13 @@
       "name": "Search String",
       "description": "Search the content of your notes",
       "default_value": "of"
+    },
+    {
+      "id": "obsidian_search_tag_vault",
+      "type": "keyword",
+      "name": "Search Tag",
+      "description": "Search tag in notes",
+      "default_value": "ot"
     },
     {
       "id": "obsidian_open_daily",

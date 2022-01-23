@@ -22,7 +22,7 @@ def create_note(name):
     ]
 
 
-def quick_capute_note(content):
+def quick_capture_note(content):
     return [
         ExtensionResultItem(
             icon=ICON_ADD_FILE,
@@ -42,5 +42,6 @@ def show_notes(vault, notes: List[Note]):
             description=note.description,
             on_enter=OpenAction(generate_url(vault, note.path)),
         )
+        # TODO Ability to change number of results in settings
         for note in notes[:10]
     ]

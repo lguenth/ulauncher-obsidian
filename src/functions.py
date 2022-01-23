@@ -75,7 +75,8 @@ def generate_url(vault: str, file: str, mode: Literal["open", "new"] = "open") -
             "obsidian://"
             + mode
             + "?"
-            + urlencode({"vault": vault_name, "file": relative_file}, quote_via=quote)
+            + urlencode({"vault": vault_name,
+                        "file": relative_file}, quote_via=quote)
         )
     except ValueError:
         if not file.endswith(".md"):
@@ -108,6 +109,24 @@ class DailySettings:
     def __init__(self, format, folder) -> None:
         self.folder = folder
         self.format = format
+
+
+class JsonPath:
+    path: str
+    exists: bool
+
+    def __init__(self, path, exists) -> None:
+        self.path = path
+        self.exists = exists
+
+
+class ExtractorSettings:
+    tag_config: str
+    # metadata_config: str
+    # except_md_config: str
+
+    def __init__(self, tag_config) -> None:
+        self.tag_config = tag_config
 
 
 def get_daily_settings(vault: str) -> DailySettings:
@@ -146,6 +165,42 @@ def get_periodic_settings(vault: str) -> DailySettings:
         format = "YYYY-MM-DD"
 
     return DailySettings(format, folder)
+
+
+def get_extractor_settings(vault: str) -> ExtractorSettings:
+    metadata_path = os.path.join(
+        vault, ".obsidian", "plugins", "metadata-extractor", "data.json"
+    )
+    tag_config = os.path.join(
+        vault, ".obsidian", "plugins", "metadata-extractor", "tags.json"
+    )
+
+    f = open(metadata_path)
+    config = json.load(f)
+    f.close()
+    tag_path = config.get("tagPath", "")
+    tag_file = config.get("tagFile", "")
+    # metadata_path = config.get("metadataPath", "")
+    # metadata_file = config.get("metadataFile", "")
+    # except_md_path = config.get("allExceptMdPath")
+    # except_md_file = config.get("allExceptMdFile", "")
+
+    if tag_path == "":
+        tag_config = tag_file
+    elif tag_file == "":
+        tag_config = tag_path
+
+    # if metadata_path == "":
+    #     metadata_config = metadata_file
+    # elif:
+    #     metadata_config = metadata_path
+
+    # if except_md_path == "":
+    #     except_md_config = except_md_file
+    # elif:
+    #     except_md_config = except_md_path
+
+    return ExtractorSettings(tag_config)
 
 
 def is_obsidian_plugin_enabled(vault: str, name: str) -> bool:
@@ -199,6 +254,19 @@ def generate_daily_url(vault: str) -> str:
     )
 
 
+def get_json_path(vault: str) -> JsonPath:
+    if is_obsidian_plugin_enabled(vault, "metadata-extractor"):
+        settings = get_extractor_settings(vault)
+    else:
+        # TODO Prompt to install plugin? The return statement will error...
+        pass
+
+    path = settings.tag_config
+    exists = os.path.exists(path)
+
+    return JsonPath(path, exists)
+
+
 def get_name_from_path(path: str, exclude_ext=True) -> str:
     """
     >>> get_name_from_path("~/home/test/bla/hallo.md")
@@ -246,11 +314,57 @@ def find_string_in_vault(vault: str, search: str) -> List[Note]:
                 for line in f:
                     left, sep, right = line.lower().partition(search)
                     if sep:
-                        context = left[CONTEXT_SIZE:] + sep + right[:CONTEXT_SIZE]
+                        context = left[CONTEXT_SIZE:] + \
+                            sep + right[:CONTEXT_SIZE]
                         suggestions.append(
                             Note(
                                 name=get_name_from_path(file),
                                 path=file,
+                                description=context,
+                            )
+                        )
+                        break
+
+    return suggestions
+
+
+def find_tag_in_vault(vault: str, search: str) -> str:
+    """
+    >>> find_tag_in_vault("test-vault", "todo")
+    [Note<test-vault/Test.md>, Note<test-vault/subdir/Test.md>]
+    """
+    tag_config = get_json_path(vault).path
+    suggestions = []
+
+    CONTEXT_SIZE = 10
+
+    if "#" in search:
+        search = search.lower().replace("#", "")
+    else:
+        search.lower()
+
+    with open(f"{tag_config}", "r") as file:
+        tag_json = json.load(file)
+        tags = [item["tag"] for item in tag_json]
+        print(tags)
+        files = [item["relativePaths"]
+                 for item in tag_json if item["tag"] == search]
+
+    # TODO unnest list with itertools?
+    for file in files[0]:
+        file = os.path.join(vault, file)
+        if os.path.isfile(file):
+            with open(file, "r") as f:
+                for line in f:
+                    left, sep, right = line.lower().partition(search)
+                    if sep:
+                        context = left[CONTEXT_SIZE:] + \
+                            sep + right[:CONTEXT_SIZE]
+                        suggestions.append(
+                            Note(
+                                name=get_name_from_path(file),
+                                path=file,
+                                # TODO output actual context...
                                 description=context,
                             )
                         )
