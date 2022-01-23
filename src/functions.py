@@ -171,25 +171,28 @@ def get_extractor_settings(vault: str) -> ExtractorSettings:
     metadata_path = os.path.join(
         vault, ".obsidian", "plugins", "metadata-extractor", "data.json"
     )
-    tag_config = os.path.join(
-        vault, ".obsidian", "plugins", "metadata-extractor", "tags.json"
-    )
+    tag_config = ""
 
-    f = open(metadata_path)
-    config = json.load(f)
-    f.close()
-    tag_path = config.get("tagPath", "")
-    tag_file = config.get("tagFile", "")
-    # metadata_path = config.get("metadataPath", "")
-    # metadata_file = config.get("metadataFile", "")
-    # except_md_path = config.get("allExceptMdPath")
-    # except_md_file = config.get("allExceptMdFile", "")
+    try:
+        f = open(metadata_path)
+        config = json.load(f)
+        f.close()
+        tag_path = config.get("tagPath", "")
+        tag_file = config.get("tagFile", "")
+        # metadata_path = config.get("metadataPath", "")
+        # metadata_file = config.get("metadataFile", "")
+        # except_md_path = config.get("allExceptMdPath")
+        # except_md_file = config.get("allExceptMdFile", "")
 
-    if tag_path == "":
-        tag_config = tag_file
-    elif tag_file == "":
-        tag_config = tag_path
+        if tag_path == "":
+            tag_config = tag_file
+        elif tag_file == "":
+            tag_config = tag_path
 
+    except:
+        tag_config = os.path.join(
+            vault, ".obsidian", "plugins", "metadata-extractor", "tags.json"
+        )
     # if metadata_path == "":
     #     metadata_config = metadata_file
     # elif:
@@ -338,17 +341,14 @@ def find_tag_in_vault(vault: str, search: str) -> str:
 
     CONTEXT_SIZE = 10
 
-    if "#" in search:
-        search = search.lower().replace("#", "")
-    else:
-        search.lower()
+    if search[0] == "#":
+        search = search.replace("#", "")
+    search = search.lower()
 
-    with open(f"{tag_config}", "r") as file:
+    with open(tag_config, "r") as file:
         tag_json = json.load(file)
-        tags = [item["tag"] for item in tag_json]
-        print(tags)
         files = [item["relativePaths"]
-                 for item in tag_json if item["tag"] == search]
+                 for item in tag_json if item["tag"].lower() == search]
 
     # TODO unnest list with itertools?
     for file in files[0]:
