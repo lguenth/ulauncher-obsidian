@@ -1,0 +1,21 @@
+[
+  {
+    "fileName": "Test",
+    "relativePath": "subdir/Test.md"
+  },
+  {
+    "fileName": "Hallo",
+    "relativePath": "subdir/Hallo.md"
+  },
+  {
+    "fileName": "Test2",
+    "relativePath": "Test2.md"
+  },
+  {
+    "fileName": "Test",
+    "relativePath": "Test.md",
+    "tags": [
+      "test"
+    ]
+  }
+]
