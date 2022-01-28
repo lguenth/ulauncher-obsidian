@@ -122,8 +122,6 @@ class JsonPath:
 
 class ExtractorSettings:
     tag_config: str
-    # metadata_config: str
-    # except_md_config: str
 
     def __init__(self, tag_config) -> None:
         self.tag_config = tag_config
@@ -179,10 +177,6 @@ def get_extractor_settings(vault: str) -> ExtractorSettings:
         f.close()
         tag_path = config.get("tagPath", "")
         tag_file = config.get("tagFile", "")
-        # metadata_path = config.get("metadataPath", "")
-        # metadata_file = config.get("metadataFile", "")
-        # except_md_path = config.get("allExceptMdPath")
-        # except_md_file = config.get("allExceptMdFile", "")
 
         if tag_path == "":
             tag_config = tag_file
@@ -193,15 +187,6 @@ def get_extractor_settings(vault: str) -> ExtractorSettings:
         tag_config = os.path.join(
             vault, ".obsidian", "plugins", "metadata-extractor", "tags.json"
         )
-    # if metadata_path == "":
-    #     metadata_config = metadata_file
-    # elif:
-    #     metadata_config = metadata_path
-
-    # if except_md_path == "":
-    #     except_md_config = except_md_file
-    # elif:
-    #     except_md_config = except_md_path
 
     return ExtractorSettings(tag_config)
 
