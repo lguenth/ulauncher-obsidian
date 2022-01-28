@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "ulauncher-obsidian"
+version = "0.1.0"
+description = "A Ulauncher extension for Obsidian.md"
+authors = ["mikebarkmin <mike@barkmin.eu>", "lguenth <mail@lukeguenther.de>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+
+[tool.poetry.dev-dependencies]
+black = "^21.12b0"
+time-machine = "^2.6.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
