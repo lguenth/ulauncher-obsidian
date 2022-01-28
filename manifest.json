@@ -3,7 +3,7 @@
   "required_api_version": "^2.0.0",
   "description": "Manage your Obsidian Vault",
   "developer_name": "Mike Barkmin",
-  "icon": "images/icon.png",
+  "icon": "assets/icon.png",
   "options": {
     "query_debounce": 0.1
   },

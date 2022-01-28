@@ -1,6 +1,6 @@
 # Obsidian Ulauncher extension
 
-![Screenshot](screenshot.png)
+![Screenshot](assets/screenshot.png)
 
 This Ulauncher extension enables you to search your [obsidian.md](https://obsidian.md/) vault and create new notes on the fly.
 
@@ -10,6 +10,7 @@ Keywords are customizable
 
 * on: Open note based on filename
 * of: Search the content of all notes
+* ot: Search for notes with a specific tag
 * od: Open daily note
 * oc: Quick capture to a note
 

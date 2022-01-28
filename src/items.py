@@ -6,8 +6,8 @@ from ulauncher.api.shared.action.ExtensionCustomAction import ExtensionCustomAct
 from .functions import generate_url, Note
 
 
-ICON_FILE = "images/icon.png"
-ICON_ADD_FILE = "images/icon-add.png"
+ICON_FILE = "assets/icon.png"
+ICON_ADD_FILE = "assets/icon-add.png"
 
 
 def create_note(name):
